@@ -13,6 +13,7 @@ Flow apps :
 5. /api/admin/validate : merupakan controller untuk melakukan validasi data customer dan payment proof (di case ini jumlah pembayaran), dan akan otomatis generate shipping id jika sudah valid.
 
 tipe order status : 
+0 = created, belum modified
 1 = accepted/confirmed
 99 = cancelled
 
