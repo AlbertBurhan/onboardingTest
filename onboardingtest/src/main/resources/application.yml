@@ -14,3 +14,10 @@ spring:
     enabled: true
     locations: classpath:resources/db/migration
     baseline-on-migrate: true
+logbook:
+  format:
+    style: splunk
+logging:
+  level:
+    org.zalando.logbook: TRACE
+

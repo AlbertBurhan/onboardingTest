@@ -14,13 +14,13 @@ public class AdminController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping(value = "/orderDetail")
+    @GetMapping(value = "/order-details")
     public List<ViewOrderDto> getOrderDetail()
     {
         return orderService.getOrderList();
     }
 
-    @GetMapping(value = "/orderDetail/{id}")
+    @GetMapping(value = "/order-details/{id}")
     @ResponseBody
     public ViewOrderDto getOrderDetailById(@PathVariable("id") Integer id)
     {

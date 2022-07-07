@@ -35,6 +35,11 @@ public class OrderService {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    public List<Product> getProduct()
+    {
+        return productRepository.findAll();
+    }
+
     public ReturnOrderDto createOrder(PlaceOrderDto pod)
     {
         Product product;
@@ -77,6 +82,14 @@ public class OrderService {
 
         for(ItemOrderDto item : pod.getItems())
         {
+            if(productRepository.findProductByName(item.getProductName()) == null)
+            {
+                ret.setDataCustomer(cust);
+                ret.setStatusOrder("Product Not Foumd, Order Failed");
+
+                orderHeaderRepository.delete(orderHeader);
+                return ret;
+            }
             product = productRepository.findProductByName(item.getProductName());
             if (product.getQty() < item.getQty()) //kalau stock kurang
             {
@@ -154,13 +167,17 @@ public class OrderService {
                 viewOrderDtos.add(viewOrderDto);
             }
         }
+        else
+        {
+            return viewOrderDtos;
+        }
         return viewOrderDtos;
     }
 
     public ViewOrderDto getOrderDetail(Integer id)
     {
         ViewOrderDto viewOrderDto = new ViewOrderDto();
-
+        if (orderHeaderRepository.getOrderHeaderById(id)==null) return viewOrderDto;
         OrderHeader header = orderHeaderRepository.getOrderHeaderById(id);
 
         viewOrderDto.setCustomerName(header.getCustomerName());

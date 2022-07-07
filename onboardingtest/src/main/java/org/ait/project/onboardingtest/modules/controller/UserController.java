@@ -1,5 +1,6 @@
 package org.ait.project.onboardingtest.modules.controller;
 
+import org.ait.project.onboardingtest.model.entity.Product;
 import org.ait.project.onboardingtest.modules.dto.request.PlaceOrderDto;
 import org.ait.project.onboardingtest.modules.dto.request.SubmitPaymentDto;
 import org.ait.project.onboardingtest.modules.dto.response.ReturnOrderDto;
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/user")
 public class UserController {
@@ -16,6 +19,13 @@ public class UserController {
 
     @Autowired
     private OrderService orderService;
+
+    @GetMapping(value = "/products")
+    @ResponseBody
+    public List<Product> getProduct()
+    {
+        return orderService.getProduct();
+    }
 
 
     @PostMapping(value = "/order")
