@@ -18,18 +18,28 @@ public interface UserDelegate {
 
     Integer getMaxId();
 
+    List<OrderHeader> getAllOrderHeader();
+
     OrderHeader getOrderHeaderById(Integer id);
 
     OrderHeader saveOrder(OrderHeader orderHeader);
 
+    List<OrderDetail> getOrderDetailById(Integer id);
+
+    Integer ttlSumDetail(Integer id);
+
     Integer getDetailMaxId();
 
     OrderDetail saveDetailOrder(OrderDetail orderDetail);
+
+    Payment getPaymentById(Integer orderId);
 
     Integer getPaymentMaxId();
 
     Payment savePayment(Payment payment);
 
     Product substractProduct(Integer itemQty, Integer productStock, String name);
+
+    OrderHeader updateShipping(OrderHeader header, Integer validity);
 
 }

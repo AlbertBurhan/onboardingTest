@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface OrderHeaderRepository extends JpaRepository<OrderHeader, String> {
+public interface OrderHeaderRepository extends JpaRepository<OrderHeader, Integer> {
     @Query(value = "SELECT COALESCE(MAX(id+1),1) FROM OrderHeader ")
     Integer getMaxId();
 
@@ -16,4 +16,6 @@ public interface OrderHeaderRepository extends JpaRepository<OrderHeader, String
 
     @Query(value = "select a from OrderHeader a where a.id = :id")
     OrderHeader getOrderHeaderById(@Param("id") Integer id);
+
+
 }

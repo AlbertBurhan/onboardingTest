@@ -43,21 +43,20 @@ public class UserServiceImpl implements UserService {
 
     public ResponseEntity<ResponseTemplate<ResponseDetail<ReturnOrderDto>>> getOrder(PlaceOrderDto placeOrderDto)
     {
-        ReturnOrderDto ret = new ReturnOrderDto();
+        ReturnOrderDto ret;
         Customer customer = userDelegate.getCustomer(placeOrderDto.getCustomerName(), placeOrderDto.getEmail());
 
         List<ItemOrderDto> items = placeOrderDto.getItems();
-
-        ret.setDataCustomer(customer);
 
         OrderHeader header = userDtoTransform.createOrderHeader(customer);
         header.setId(userDelegate.getMaxId());
         header.setShippingId(null);
         userDelegate.saveOrder(header);
 
+        ret = userDtoTransform.createReturnOrder(customer, header);
+
         Integer ttlPrice = this.calculatePrice(items, header.getId());
         ret.setTotalPrice(ttlPrice);
-        ret.setOrderId(header.getId());
         ret.setStatusOrder("Finalized and Submitted");
 
         return responseHelper.createResponseDetail(ResponseEnum.SUCCESS, ret); //response detail tidak sesuai form (?)
@@ -65,21 +64,21 @@ public class UserServiceImpl implements UserService {
 
     private Integer calculatePrice(List<ItemOrderDto> itemOrderDtos, Integer headerId)
     {
-        Integer ttl = 0;
+        Integer ttlProductPrice = 0;
         for(ItemOrderDto item : itemOrderDtos)
         {
             Product product = userDelegate.getProductByName(item.getProductName());
 
             if (product.getQty() == 0) break;
 
-            ttl = ttl + product.getPrice() * this.checkAvailableQty(item.getQty(), product.getQty());
+            ttlProductPrice = ttlProductPrice + product.getPrice() * this.checkAvailableQty(item.getQty(), product.getQty());
 
             this.createAndSaveDetail(headerId, product, this.checkAvailableQty(item.getQty(), product.getQty()));
 
             this.substractProductStock(item.getQty(), product.getQty(), product.getName());
 
         }
-        return ttl;
+        return ttlProductPrice;
     }
 
     private Integer checkAvailableQty(Integer itemBought, Integer productStock)

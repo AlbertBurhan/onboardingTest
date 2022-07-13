@@ -1,6 +1,7 @@
 package org.ait.project.onboardingtest.modules.user.service.delegate.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.ait.project.onboardingtest.modules.user.exception.UserRepositoryNotFound;
 import org.ait.project.onboardingtest.modules.user.model.entity.OrderDetail;
 import org.ait.project.onboardingtest.modules.user.model.entity.OrderHeader;
 import org.ait.project.onboardingtest.modules.user.model.entity.Payment;
@@ -15,6 +16,7 @@ import org.ait.project.onboardingtest.modules.user.service.delegate.UserDelegate
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +35,12 @@ public class UserServiceDelegateImpl implements UserDelegate {
 
     @Override
     public Product getProductByName(String name){
-        return productRepository.findProductByName(name);
+        return productRepository.findByName(name);
     }
 
     @Override
     public Customer getCustomer(String name, String email){
-        return customerRepository.getCustomerByCustNameAndEmail(name, email);
+        return customerRepository.findAllByCustomerNameAndEmail(name, email);
     }
 
     @Override
@@ -48,15 +50,33 @@ public class UserServiceDelegateImpl implements UserDelegate {
     }
 
     @Override
+    public List<OrderHeader> getAllOrderHeader()
+    {
+        return orderHeaderRepository.findAll();
+    }
+
+    @Override
     public OrderHeader getOrderHeaderById(Integer id)
     {
-        return orderHeaderRepository.getOrderHeaderById(id);
+        return orderHeaderRepository.findById(id).orElseThrow(UserRepositoryNotFound::new);
     }
 
     @Override
     public OrderHeader saveOrder(OrderHeader orderHeader)
     {
         return orderHeaderRepository.save(orderHeader);
+    }
+
+    @Override
+    public List<OrderDetail> getOrderDetailById(Integer id)
+    {
+        return orderDetailRepository.getOrderDetailById(id);
+    }
+
+    @Override
+    public Integer ttlSumDetail(Integer id)
+    {
+        return orderDetailRepository.getTtlPrice(id);
     }
 
     @Override
@@ -69,6 +89,12 @@ public class UserServiceDelegateImpl implements UserDelegate {
     public OrderDetail saveDetailOrder(OrderDetail orderDetail)
     {
         return orderDetailRepository.save(orderDetail);
+    }
+
+    @Override
+    public Payment getPaymentById(Integer orderId)
+    {
+        return paymentRepository.getAllByOrderId(orderId);
     }
 
     @Override
@@ -90,5 +116,14 @@ public class UserServiceDelegateImpl implements UserDelegate {
         product.setQty(productStock - itemQty);
 
         return productRepository.save(product);
+    }
+
+    @Override
+    public OrderHeader updateShipping(OrderHeader header, Integer validity)
+    {
+        header.setShippingId(UUID.randomUUID().toString());
+        header.setOrderStatus(validity);
+
+        return orderHeaderRepository.save(header);
     }
 }

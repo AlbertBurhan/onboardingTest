@@ -12,6 +12,7 @@ public enum ResponseEnum {
 
   INVALID_PARAM("PMRK-0009", "invalid.param", HttpStatus.BAD_REQUEST),
   INTERNAL_SERVER_ERROR("PMRK-9999", "internal.server.error", HttpStatus.INTERNAL_SERVER_ERROR),
+  PRODUCT_NOT_FOUND("PMRK-0002", "product.not.found", HttpStatus.NOT_FOUND),
 
   ;
 

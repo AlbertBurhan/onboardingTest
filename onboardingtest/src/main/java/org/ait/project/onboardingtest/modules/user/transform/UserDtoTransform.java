@@ -1,5 +1,6 @@
 package org.ait.project.onboardingtest.modules.user.transform;
 
+import org.ait.project.onboardingtest.modules.user.dto.response.ReturnOrderDto;
 import org.ait.project.onboardingtest.modules.user.model.entity.OrderDetail;
 import org.ait.project.onboardingtest.modules.user.model.entity.OrderHeader;
 import org.ait.project.onboardingtest.modules.user.model.entity.Payment;
@@ -13,6 +14,10 @@ import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring") // for Dependency Injection Spring
 public interface UserDtoTransform {
+    @Named("createReturnOrder")
+    @Mapping(source = "customer", target = "dataCustomer")
+    @Mapping(source = "header.id", target = "orderId")
+    ReturnOrderDto createReturnOrder(Customer customer, OrderHeader header);
 
     @Named("createOrderHeader")
     @Mapping(source = "customer.phoneNumber", target = "customerPhone")

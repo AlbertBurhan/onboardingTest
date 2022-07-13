@@ -3,7 +3,6 @@ package org.ait.project.onboardingtest.modules.admin.service.internal.impl;
 import lombok.RequiredArgsConstructor;
 import org.ait.project.onboardingtest.modules.user.model.entity.OrderHeader;
 import org.ait.project.onboardingtest.modules.user.model.entity.Payment;
-import org.ait.project.onboardingtest.modules.admin.service.delegate.AdminDelegate;
 import org.ait.project.onboardingtest.modules.admin.service.internal.AdminService;
 import org.ait.project.onboardingtest.modules.admin.transform.AdminDtoTransform;
 import org.ait.project.onboardingtest.modules.user.dto.request.ViewOrderDto;
@@ -23,7 +22,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
-    private final AdminDelegate adminDelegate;
     private final UserDelegate userDelegate;
     private final ResponseHelper responseHelper;
     private final AdminDtoTransform adminDtoTransform;
@@ -39,22 +37,22 @@ public class AdminServiceImpl implements AdminService {
 
     public ResponseEntity<ResponseTemplate<ResponseDetail<ViewOrderDto>>> getOrderById(Integer id)
     {
-        OrderHeader orderHeader = adminDelegate.getOrderHeaderById(id);
+        OrderHeader orderHeader = userDelegate.getOrderHeaderById(id);
         ViewOrderDto viewOrderDto = adminDtoTransform.createViewOrderDto(orderHeader);
-        viewOrderDto.setTtlPrice(adminDelegate.ttlSumDetail(id));
-        viewOrderDto.setOrderDetails(adminDelegate.getOrderDetailById(id));
+        viewOrderDto.setTtlPrice(userDelegate.ttlSumDetail(id));
+        viewOrderDto.setOrderDetails(userDelegate.getOrderDetailById(id));
         return responseHelper.createResponseDetail(ResponseEnum.SUCCESS, viewOrderDto);
     }
 
     private List<ViewOrderDto> createViewer()
     {
-        List<OrderHeader> headers = adminDelegate.getAllOrderHeader();
+        List<OrderHeader> headers = userDelegate.getAllOrderHeader();
         List<ViewOrderDto> viewOrderDtoList = new ArrayList<>();
         for (OrderHeader header : headers)
         {
             ViewOrderDto viewOrderDto = adminDtoTransform.createViewOrderDto(header);
-            viewOrderDto.setTtlPrice(adminDelegate.ttlSumDetail(header.getId()));
-            viewOrderDto.setOrderDetails(adminDelegate.getOrderDetailById(header.getId()));
+            viewOrderDto.setTtlPrice(userDelegate.ttlSumDetail(header.getId()));
+            viewOrderDto.setOrderDetails(userDelegate.getOrderDetailById(header.getId()));
 
             viewOrderDtoList.add(viewOrderDto);
         }
@@ -63,13 +61,13 @@ public class AdminServiceImpl implements AdminService {
 
     public ResponseEntity<ResponseTemplate<ResponseDetail<ReturnPaymentDto>>> validate(Integer id)
     {
-        OrderHeader orderHeader = adminDelegate.getOrderHeaderById(id);
-        Payment payment = adminDelegate.getPaymentById(id);
+        OrderHeader orderHeader = userDelegate.getOrderHeaderById(id);
+        Payment payment = userDelegate.getPaymentById(id);
         ReturnPaymentDto ret = adminDtoTransform.createReturnPaymentDto(orderHeader, payment);
 
         Integer validity = 99;
 
-        if (payment.getPaymentValue() == adminDelegate.ttlSumDetail(id)) validity = 1;
+        if (payment.getPaymentValue() == userDelegate.ttlSumDetail(id)) validity = 1;
 
         this.updateShipping(orderHeader, validity);
 
@@ -78,6 +76,6 @@ public class AdminServiceImpl implements AdminService {
 
     private void updateShipping(OrderHeader header, Integer validity)
     {
-        adminDelegate.updateShipping(header, validity);
+        userDelegate.updateShipping(header, validity);
     }
 }
