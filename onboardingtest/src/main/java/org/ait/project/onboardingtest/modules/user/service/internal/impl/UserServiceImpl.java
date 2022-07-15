@@ -1,6 +1,7 @@
 package org.ait.project.onboardingtest.modules.user.service.internal.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ait.project.onboardingtest.modules.user.model.entity.OrderDetail;
 import org.ait.project.onboardingtest.modules.user.model.entity.OrderHeader;
 import org.ait.project.onboardingtest.modules.user.model.entity.Payment;
@@ -20,7 +21,6 @@ import org.ait.project.onboardingtest.shared.dto.template.ResponseDetail;
 import org.ait.project.onboardingtest.shared.dto.template.ResponseList;
 import org.ait.project.onboardingtest.shared.dto.template.ResponseTemplate;
 import org.ait.project.onboardingtest.shared.utils.ResponseHelper;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +28,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final ResponseHelper responseHelper;
     private final UserDelegate userDelegate;
     private final UserDtoTransform userDtoTransform;
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public ResponseEntity<ResponseTemplate<ResponseList<Product>>> getProduct()
     {
@@ -58,6 +58,7 @@ public class UserServiceImpl implements UserService {
         Integer ttlPrice = this.calculatePrice(items, header.getId());
         ret.setTotalPrice(ttlPrice);
         ret.setStatusOrder("Finalized and Submitted");
+        if (ttlPrice == 0) validateReturn(header, ret);
 
         return responseHelper.createResponseDetail(ResponseEnum.SUCCESS, ret); //response detail tidak sesuai form (?)
     }
@@ -68,8 +69,7 @@ public class UserServiceImpl implements UserService {
         for(ItemOrderDto item : itemOrderDtos)
         {
             Product product = userDelegate.getProductByName(item.getProductName());
-
-            if (product.getQty() == 0) break;
+            if (product.getQty() == 0) continue;
 
             ttlProductPrice = ttlProductPrice + product.getPrice() * this.checkAvailableQty(item.getQty(), product.getQty());
 
@@ -79,6 +79,19 @@ public class UserServiceImpl implements UserService {
 
         }
         return ttlProductPrice;
+    }
+
+    private void removeOrder(OrderHeader header)
+    {
+        userDelegate.deleteOrder(header);
+    }
+
+    private ReturnOrderDto validateReturn(OrderHeader header, ReturnOrderDto ret)
+    {
+        this.removeOrder(header);
+        ret.setStatusOrder("Product out of stock, Order Failed");
+
+        return ret;
     }
 
     private Integer checkAvailableQty(Integer itemBought, Integer productStock)
@@ -127,5 +140,6 @@ public class UserServiceImpl implements UserService {
         payment.setPaymentId(userDelegate.getPaymentMaxId());
 
         userDelegate.savePayment(payment);
+
     }
 }

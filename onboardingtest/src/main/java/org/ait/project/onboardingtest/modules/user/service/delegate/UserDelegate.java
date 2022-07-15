@@ -24,6 +24,8 @@ public interface UserDelegate {
 
     OrderHeader saveOrder(OrderHeader orderHeader);
 
+    void deleteOrder(OrderHeader orderHeader);
+
     List<OrderDetail> getOrderDetailById(Integer id);
 
     Integer ttlSumDetail(Integer id);
@@ -32,7 +34,7 @@ public interface UserDelegate {
 
     OrderDetail saveDetailOrder(OrderDetail orderDetail);
 
-    Payment getPaymentById(Integer orderId);
+    Payment getPaymentByOrderId(Integer orderId);
 
     Integer getPaymentMaxId();
 

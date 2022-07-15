@@ -68,6 +68,12 @@ public class UserServiceDelegateImpl implements UserDelegate {
     }
 
     @Override
+    public void deleteOrder(OrderHeader orderHeader)
+    {
+         orderHeaderRepository.delete(orderHeader);
+    }
+
+    @Override
     public List<OrderDetail> getOrderDetailById(Integer id)
     {
         return orderDetailRepository.getOrderDetailById(id);
@@ -92,7 +98,7 @@ public class UserServiceDelegateImpl implements UserDelegate {
     }
 
     @Override
-    public Payment getPaymentById(Integer orderId)
+    public Payment getPaymentByOrderId(Integer orderId)
     {
         return paymentRepository.getAllByOrderId(orderId);
     }
@@ -121,7 +127,7 @@ public class UserServiceDelegateImpl implements UserDelegate {
     @Override
     public OrderHeader updateShipping(OrderHeader header, Integer validity)
     {
-        header.setShippingId(UUID.randomUUID().toString());
+        if (validity != 99) header.setShippingId(UUID.randomUUID().toString());
         header.setOrderStatus(validity);
 
         return orderHeaderRepository.save(header);

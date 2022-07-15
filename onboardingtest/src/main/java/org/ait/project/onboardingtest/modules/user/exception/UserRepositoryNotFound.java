@@ -9,7 +9,7 @@ public class UserRepositoryNotFound extends ModuleException {
 
     public UserRepositoryNotFound()
     {
-        super(ResponseEnum.PRODUCT_NOT_FOUND);
-        log.error("Product not found");
+        super(ResponseEnum.ORDER_NOT_FOUND);
+        log.error("Order not found");
     }
 }
